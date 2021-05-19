@@ -35,7 +35,46 @@ float Tensor::operator()(int i, int j, int k) const{
  */
 float& Tensor::operator()(int i, int j, int k){
 
+
+
+
 }
+
+/**
+ * Class constructor
+ *
+ * Creates a new tensor of size r*c*d initialized at value v
+ *
+ * @param r
+ * @param c
+ * @param d
+ * @param v
+ * @return new Tensor
+ */
+Tensor::Tensor(int r, int c, int d, float v = 0.0){
+    this->r = r;
+    this->c = c;
+    this->d = d;
+
+    data = new float** [r];
+
+    for (int i = 0; i < r; ++i){
+
+        data[i] = new float* [c];
+
+        for (int j = 0; j < c; ++j){
+
+            data[i][j] = new float[d];
+
+            for (int k = 0; k < d; ++k){
+                data[i][j][k] = v;
+            }
+        }
+    }
+
+}
+
+
 
 /**
  * Copy constructor
@@ -45,7 +84,25 @@ float& Tensor::operator()(int i, int j, int k){
  * @return the new Tensor
  */
 Tensor::Tensor(const Tensor& that){
+    r = that.r;
+    c = that.c;
+    d = that.d;
 
+    data = new float** [r];
+
+    for (int i = 0; i < r; ++i){
+
+        data[i] = new float* [c];
+
+        for (int j = 0; j < c; ++j){
+
+            data[i][j] = new float[d];
+
+            for (int k = 0; k < d; ++k){
+                data[i][j][k] = that.data[i][j][k];
+            }
+        }
+    }
 }
 
 /**
@@ -429,11 +486,11 @@ void Tensor::showSize()const{
  * [..., ..., 1]
  * ...
  * [..., ..., k]
-
-friend ostream& Tensor::operator<< (ostream& stream, const Tensor& obj){
+*/
+ostream& operator<< (ostream& stream, const Tensor& obj){
 
 }
-*/
+
 /**
  * Reading from file
  *
