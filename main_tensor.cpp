@@ -13,19 +13,19 @@ void show_help(){
     printf("\n");
 }
 
-int main (int argc, char * argv[]) {
+int main(int argc, char* argv[]){
 
-    char * fn_in_1;  /* file 1 */
-    char * fn_in_2;  /* file 2 */
-    char * operation; /* operazione da eseguire */
-    char * fn_out; /* output file */
+    char* fn_in_1;  /* file 1 */
+    char* fn_in_2;  /* file 2 */
+    char* operation; /* operazione da eseguire */
+    char* fn_out; /* output file */
 
     int axis = 0; /* axis for concat */
 
     /* variabili di appoggio per le computazioni */
-    Tensor a,b,out;
+    Tensor a, b, out;
 
-    if(argc<4){
+    if (argc < 4){
         show_help();
         return 0;
     }
@@ -35,26 +35,26 @@ int main (int argc, char * argv[]) {
     operation = argv[3]; /* operazione da eseguire */
     fn_out = argv[4]; /* output file */
 
-    if(argc>5) {
+    if (argc > 5){
         axis = atoi(argv[5]);
     }
 
     a.read_file(fn_in_1);
     b.read_file(fn_in_2);
-    
-    if (strcmp(operation, "+") == 0) {
-        out=a+b; 
-    }else if(strcmp(operation, "-") == 0) {
-        out=a-b; 
-    }else if(strcmp(operation, "x") == 0) {
-        out=a*b; 
-    }else if(strcmp(operation, "convolve") == 0) {
-        out=a.convolve(b); 
-    }else if(strcmp(operation, "concat") == 0) {
-        out=a.concat(b,axis); 
-    }else if(strcmp(operation, "d") == 0) {
-        out=a/b; 
-    }else {
+
+    if (strcmp(operation, "+") == 0){
+        out = a + b;
+    } else if (strcmp(operation, "-") == 0){
+        out = a - b;
+    } else if (strcmp(operation, "x") == 0){
+        out = a * b;
+    } else if (strcmp(operation, "convolve") == 0){
+        out = a.convolve(b);
+    } else if (strcmp(operation, "concat") == 0){
+        out = a.concat(b, axis);
+    } else if (strcmp(operation, "d") == 0){
+        out = a / b;
+    } else{
         throw(unknown_operation());
     }
 
