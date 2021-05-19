@@ -95,7 +95,7 @@ int DAISGram::getDepth(){
  * @return returns a new DAISGram containing the modified object
  */
 DAISGram DAISGram::brighten(float bright){
-
+    //Deve aumentare ogni elemento dell'array 3D del valore in ingresso con il cap [0,255]
 }
 
 /**
@@ -123,7 +123,8 @@ DAISGram DAISGram::grayscale(){
  * @return returns a new DAISGram containing the modified object
  */
 DAISGram DAISGram::warhol(){
-
+    //top right devo salvare i valori del canale Rosso, Copiare il canale verde su quello rosso e copiare la copia sul verde
+    //Dimensione doppia dell'immagine originale
 }
 
 /**
