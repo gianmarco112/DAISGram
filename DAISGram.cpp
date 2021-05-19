@@ -63,7 +63,7 @@ void DAISGram::save_image(string filename){
          * @return returns the number of rows in the image
          */
 int DAISGram::getRows(){
-    return data.rows();//Gian
+    return data.rows();
 }
 
 /**
@@ -72,7 +72,7 @@ int DAISGram::getRows(){
  * @return returns the number of columns in the image
  */
 int DAISGram::getCols(){
-    return data.cols();//Gian
+    return data.cols();
 }
 
 /**
@@ -81,7 +81,7 @@ int DAISGram::getCols(){
  * @return returns the number of channels in the image
  */
 int DAISGram::getDepth(){
-    return data.depth();//Gian
+    return data.depth();
 }
 
 /**
