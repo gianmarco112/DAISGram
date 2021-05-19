@@ -12,33 +12,7 @@
 #define FLT_MIN 1.175494351e-38F /* min positive value */
 
 using namespace std;
-/**
-     * Operator overloading ()
-     *
-     * if indexes are out of bound throw index_out_of_bound() exception
-     *
-     * @return the value at location [i][j][k]
-     */
-float Tensor::operator()(int i, int j, int k) const{
 
-}
-
-/**
- * Operator overloading ()
- *
- * Return the pointer to the location [i][j][k] such that the operator (i,j,k) can be used to
- * modify tensor data.
- *
- * If indexes are out of bound throw index_out_of_bound() exception
- *
- * @return the pointer to the location [i][j][k]
- */
-float& Tensor::operator()(int i, int j, int k){
-
-
-
-
-}
 
 /**
  * Class constructor
@@ -71,7 +45,6 @@ Tensor::Tensor(int r, int c, int d, float v = 0.0){
             }
         }
     }
-
 }
 
 
@@ -104,6 +77,59 @@ Tensor::Tensor(const Tensor& that){
         }
     }
 }
+/**
+* Class distructor
+*
+ * Cleanup the data when deallocated
+ */
+Tensor::~Tensor(){
+    for (int i = 0; i < r; ++i){
+        for (int j = 0; j < c; ++j){
+            delete[] data[i][j];
+        }
+        delete[] data[i];
+    }
+    delete[] data;
+}
+
+/**
+     * Operator overloading ()
+     *
+     * if indexes are out of bound throw index_out_of_bound() exception
+     *
+     * @return the value at location [i][j][k]
+     */
+float Tensor::operator()(int i, int j, int k) const{
+
+    if (data == nullptr) throw tensor_not_initialized();
+
+    if (i >= r || i < 0) throw index_out_of_bound();
+    if (j >= c || j < 0) throw index_out_of_bound();
+    if (k >= d || k < 0) throw index_out_of_bound();
+
+    return data[i][j][k];
+}
+
+/**
+ * Operator overloading ()
+ *
+ * Return the pointer to the location [i][j][k] such that the operator (i,j,k) can be used to
+ * modify tensor data.
+ *
+ * If indexes are out of bound throw index_out_of_bound() exception
+ *
+ * @return the pointer to the location [i][j][k]
+ */
+float& Tensor::operator()(int i, int j, int k){
+
+    if (data == nullptr) throw tensor_not_initialized();
+
+    if (i >= r || i < 0) throw index_out_of_bound();
+    if (j >= c || j < 0) throw index_out_of_bound();
+    if (k >= d || k < 0) throw index_out_of_bound();
+
+    return data[i][j][k];
+}
 
 /**
  * Operator overloading ==
@@ -122,7 +148,7 @@ Tensor::Tensor(const Tensor& that){
  * So, given two floating point numbers "a" and "b", how can we check their equivalence?
  * through this formula:
  *
- * a ?= b if and only if |a-b|<EPSILON
+ * a == b if and only if |a-b|<EPSILON
  *
  * where EPSILON is fixed constant (defined at the beginning of this header file)
  *
@@ -136,6 +162,37 @@ Tensor::Tensor(const Tensor& that){
  */
 bool Tensor::operator==(const Tensor& rhs) const{
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    if (rhs.data == nullptr) throw tensor_not_initialized();
+
+    if (r != rhs.r || c != rhs.c || d != rhs.d) throw dimension_mismatch();
+
+    bool check = true;
+
+    int i = 0, j = 0, k = 0;
+
+    while (i < r && check){
+
+        j = 0;
+
+        while (j < c && check){
+
+            k = 0;
+
+            while (k < d && check){
+                float delta = data[i][j][k] - rhs.data[i][j][k];
+
+                if (abs(delta) >= EPSILON) check = false;
+
+                ++k;
+            }
+            ++j;
+        }
+        ++i;
+    }
+
+    return check;
 }
 
 /**
@@ -151,6 +208,26 @@ bool Tensor::operator==(const Tensor& rhs) const{
  */
 Tensor Tensor::operator-(const Tensor& rhs)const{
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    if (rhs.data == nullptr) throw tensor_not_initialized();
+
+    if (r != rhs.r || c != rhs.c || d != rhs.d) throw dimension_mismatch();
+
+    Tensor copy(*this);
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                copy.data[i][j][k] -= rhs.data[i][j][k];
+            }
+        }
+    }
+
+    return copy;
 }
 
  /**
@@ -166,6 +243,26 @@ Tensor Tensor::operator-(const Tensor& rhs)const{
 */
 Tensor Tensor::operator +(const Tensor& rhs)const{
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    if (rhs.data == nullptr) throw tensor_not_initialized();
+
+    if (r != rhs.r || c != rhs.c || d != rhs.d) throw dimension_mismatch();
+
+    Tensor copy(*this);
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                copy.data[i][j][k] += rhs.data[i][j][k];
+            }
+        }
+    }
+
+    return copy;
 }
 
 /**
@@ -181,6 +278,26 @@ Tensor Tensor::operator +(const Tensor& rhs)const{
  */
 Tensor Tensor::operator*(const Tensor& rhs)const{
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    if (rhs.data == nullptr) throw tensor_not_initialized();
+
+    if (r != rhs.r || c != rhs.c || d != rhs.d) throw dimension_mismatch();
+
+    Tensor copy(*this);
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                copy.data[i][j][k] *= rhs.data[i][j][k];
+            }
+        }
+    }
+
+    return copy;
 }
 
 /**
@@ -196,6 +313,26 @@ Tensor Tensor::operator*(const Tensor& rhs)const{
  */
 Tensor Tensor::operator/(const Tensor& rhs)const{
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    if (rhs.data == nullptr) throw tensor_not_initialized();
+
+    if (r != rhs.r || c != rhs.c || d != rhs.d) throw dimension_mismatch();
+
+    Tensor copy(*this);
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                copy.data[i][j][k] /= rhs.data[i][j][k];
+            }
+        }
+    }
+
+    return copy;
 }
 
 /**
@@ -209,6 +346,22 @@ Tensor Tensor::operator/(const Tensor& rhs)const{
  */
 Tensor Tensor::operator-(const float& rhs)const{
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    Tensor copy(*this);
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                copy.data[i][j][k] -= rhs;
+            }
+        }
+    }
+
+    return copy;
 }
 
 /**
@@ -222,6 +375,22 @@ Tensor Tensor::operator-(const float& rhs)const{
  */
 Tensor Tensor::operator+(const float& rhs)const{
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    Tensor copy(*this);
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                copy.data[i][j][k] += rhs;
+            }
+        }
+    }
+
+    return copy;
 }
 
 /**
@@ -235,6 +404,22 @@ Tensor Tensor::operator+(const float& rhs)const{
  */
 Tensor Tensor::operator*(const float& rhs)const{
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    Tensor copy(*this);
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                copy.data[i][j][k] *= rhs;
+            }
+        }
+    }
+
+    return copy;
 }
 
 /**
@@ -248,6 +433,22 @@ Tensor Tensor::operator*(const float& rhs)const{
  */
 Tensor Tensor::operator/(const float& rhs)const{
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    Tensor copy(*this);
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                copy.data[i][j][k] /= rhs;
+            }
+        }
+    }
+
+    return copy;
 }
 
 /**
@@ -259,6 +460,25 @@ Tensor Tensor::operator/(const float& rhs)const{
  */
 Tensor& Tensor::operator=(const Tensor& other){
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    if (other.data == nullptr) throw tensor_not_initialized();
+
+    if (r != other.r || c != other.c || d != other.d) throw dimension_mismatch();
+
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                data[i][j][k] = other.data[i][j][k];
+            }
+        }
+    }
+
+    return *this;
 }
 
 /**
@@ -298,7 +518,28 @@ void Tensor::init_random(float mean, float std){
      * @param v The initialization value
      */
 void Tensor::init(int r, int c, int d, float v = 0.0){
+    if (data != nullptr) throw unknown_operation();
 
+
+    this->r = r;
+    this->c = c;
+    this->d = d;
+
+    data = new float** [r];
+
+    for (int i = 0; i < r; ++i){
+
+        data[i] = new float* [c];
+
+        for (int j = 0; j < c; ++j){
+
+            data[i][j] = new float[d];
+
+            for (int k = 0; k < d; ++k){
+                data[i][j][k] = v;
+            }
+        }
+    }
 }
 
 /**
@@ -310,6 +551,21 @@ void Tensor::init(int r, int c, int d, float v = 0.0){
  * @param high Higher value
  */
 void Tensor::clamp(float low, float high){
+    if (data == nullptr) throw tensor_not_initialized();
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                if (data[i][j][k] > high)
+                    data[i][j][k] = high;
+                else if (data[i][j][k] < low)
+                    data[i][j][k] = low;
+            }
+        }
+    }
 
 }
 
@@ -330,6 +586,30 @@ void Tensor::clamp(float low, float high){
  */
 void Tensor::rescale(float new_max = 1.0){
 
+    if (data == nullptr) throw tensor_not_initialized();
+
+    for (int k = 0; k < d; ++k){
+
+        float max = getMax(k);
+        float min = getMin(k);
+
+        if (min != max){
+            for (int i = 0; i < r; ++i){
+                for (int j = 0; j < c; ++j){
+
+                    data[i][j][k] = ((data[i][j][k] - min) / (max - min)) * new_max;
+                }
+            }
+        } else{
+            for (int i = 0; i < r; ++i){
+                for (int j = 0; j < c; ++j){
+
+                    data[i][j][k] = new_max;
+                }
+            }
+        }
+
+    }
 }
 
 /**
@@ -344,7 +624,23 @@ void Tensor::rescale(float new_max = 1.0){
  * @return the padded tensor
  */
 Tensor Tensor::padding(int pad_h, int pad_w)const{
+    if (data == nullptr) throw tensor_not_initialized();
 
+    if (pad_w < 0 || pad_h < 0) throw unknown_operation();
+
+    Tensor pad(r + 2 * pad_h, c + 2 * pad_w, d, 0.0f);
+
+    for (int i = 0; i < r; ++i){
+
+        for (int j = 0; j < c; ++j){
+
+            for (int k = 0; k < d; ++k){
+
+                pad[i + pad_h][j + pad_w][d] = data[i][j][k];
+            }
+        }
+    }
+    return pad;
 }
 
 /**
@@ -417,7 +713,7 @@ Tensor Tensor::convolve(const Tensor& f)const{
  * @return the number of rows in the tensor
  */
 int Tensor::rows()const{
-
+    return r;
 }
 
 /**
@@ -426,7 +722,7 @@ int Tensor::rows()const{
  * @return the number of columns in the tensor
  */
 int Tensor::cols()const{
-
+    return c;
 }
 
 /**
@@ -435,7 +731,7 @@ int Tensor::cols()const{
  * @return the depth of the tensor
  */
 int Tensor::depth()const{
-
+    return d;
 }
 
 /**
@@ -446,7 +742,19 @@ int Tensor::depth()const{
  * @return the minimum of data( , , k)
  */
 float Tensor::getMin(int k)const{
+    if (data == nullptr) throw tensor_not_initialized();
 
+    float min = data[0][0][k];
+
+    for (int i = 0; i < r; ++i){
+        for (int j = 0; j < c; ++j){
+
+            if (data[i][j][k] < min)
+                min = data[i][j][k];
+        }
+    }
+
+    return min;
 }
 
 /**
@@ -457,7 +765,19 @@ float Tensor::getMin(int k)const{
  * @return the maximum of data( , , k)
  */
 float Tensor::getMax(int k)const{
+    if (data == nullptr) throw tensor_not_initialized();
 
+    float max = data[0][0][k];
+
+    for (int i = 0; i < r; ++i){
+        for (int j = 0; j < c; ++j){
+
+            if (data[i][j][k] > max)
+                max = data[i][j][k];
+        }
+    }
+
+    return max;
 }
 
 /**
@@ -470,7 +790,7 @@ float Tensor::getMax(int k)const{
  *
  */
 void Tensor::showSize()const{
-
+    cout << r << " x " << c << " x " << d << endl;
 }
 
 /* IOSTREAM */
@@ -486,9 +806,26 @@ void Tensor::showSize()const{
  * [..., ..., 1]
  * ...
  * [..., ..., k]
+ * k: [0 0 0 , 0 0 0, 0 0 0]
 */
 ostream& operator<< (ostream& stream, const Tensor& obj){
+    if (obj.data == nullptr) throw tensor_not_initialized();
 
+    for (int k = 0; k < d; ++k){
+        stream << k << ": [";
+
+        for (int i = 0; i < r; ++i){
+            for (int j = 0; j < c; ++j){
+                stream << data[i][j][k];
+
+                if (j != c - 1) stream << " ";
+            }
+
+            if (i != r - 1) stream << ",";
+        }
+
+        stream << "]" << endl;
+    }
 }
 
 /**
@@ -519,6 +856,32 @@ ostream& operator<< (ostream& stream, const Tensor& obj){
  * @param filename the filename where the tensor is stored
  */
 void Tensor::read_file(string filename){
+    ifstream input{ filename };
+
+    input >> r >> c >> d;
+
+    float*** tmp = data;
+    data = nullptr;
+
+    if (tmp != nullptr){
+        for (int i = 0; i < r; ++i){
+            for (int j = 0; j < c; ++j){
+                delete[] tmp[i][j];
+            }
+            delete[] tmp[i];
+        }
+        delete[] tmp;
+    }
+
+    init(r, c, d, 0.0F);
+
+    for (int i = 0; i < r; ++i){
+        for (int j = 0; j < c; ++j){
+            for (int k = 0; k < d; ++k){
+                input >> data[i][j][k];
+            }
+        }
+    }
 
 }
 
@@ -548,5 +911,19 @@ void Tensor::read_file(string filename){
  * @param filename the filename where the tensor should be stored
  */
 void Tensor::write_file(string filename){
+    ofstream output{ filename };
 
+    output << r << c << d;
+
+    for (int i = 0; i < r; ++i){
+        for (int j = 0; j < c; ++j){
+            for (int k = 0; k < d; ++k){
+                output << data[i][j][k];
+            }
+        }
+    }
 }
+
+
+
+// TODO: ERROR FILE AND UNKOWN OPERATION ON FILE (INIT)
