@@ -72,7 +72,7 @@ Tensor::Tensor(const Tensor& that){
             data[i][j] = new float[d];
 
             for (int k = 0; k < d; ++k){
-                data[i][j][k] = that.data[i][j][k];
+                data[i][j][k] = that(i, j, k);
             }
         }
     }
@@ -181,7 +181,7 @@ bool Tensor::operator==(const Tensor& rhs) const{
             k = 0;
 
             while (k < d && check){
-                float delta = data[i][j][k] - rhs.data[i][j][k];
+                float delta = data[i][j][k] - rhs(i, j, k);
 
                 if (abs(delta) >= EPSILON) check = false;
 
@@ -222,7 +222,7 @@ Tensor Tensor::operator-(const Tensor& rhs)const{
 
             for (int k = 0; k < d; ++k){
 
-                copy.data[i][j][k] -= rhs.data[i][j][k];
+                copy(i, j, k) -= rhs(i, j, k);
             }
         }
     }
@@ -257,7 +257,7 @@ Tensor Tensor::operator +(const Tensor& rhs)const{
 
             for (int k = 0; k < d; ++k){
 
-                copy.data[i][j][k] += rhs.data[i][j][k];
+                copy(i, j, k) += rhs(i, j, k);
             }
         }
     }
@@ -292,7 +292,7 @@ Tensor Tensor::operator*(const Tensor& rhs)const{
 
             for (int k = 0; k < d; ++k){
 
-                copy.data[i][j][k] *= rhs.data[i][j][k];
+                copy(i, j, k) *= rhs(i, j, k);
             }
         }
     }
@@ -327,7 +327,7 @@ Tensor Tensor::operator/(const Tensor& rhs)const{
 
             for (int k = 0; k < d; ++k){
 
-                copy.data[i][j][k] /= rhs.data[i][j][k];
+                copy(i, j, k) /= rhs(i, j, k);
             }
         }
     }
@@ -356,7 +356,7 @@ Tensor Tensor::operator-(const float& rhs)const{
 
             for (int k = 0; k < d; ++k){
 
-                copy.data[i][j][k] -= rhs;
+                copy(i, j, k) -= rhs;
             }
         }
     }
@@ -385,7 +385,7 @@ Tensor Tensor::operator+(const float& rhs)const{
 
             for (int k = 0; k < d; ++k){
 
-                copy.data[i][j][k] += rhs;
+                copy(i, j, k) += rhs;
             }
         }
     }
@@ -414,7 +414,7 @@ Tensor Tensor::operator*(const float& rhs)const{
 
             for (int k = 0; k < d; ++k){
 
-                copy.data[i][j][k] *= rhs;
+                copy(i, j, k) *= rhs;
             }
         }
     }
@@ -443,7 +443,7 @@ Tensor Tensor::operator/(const float& rhs)const{
 
             for (int k = 0; k < d; ++k){
 
-                copy.data[i][j][k] /= rhs;
+                copy(i, j, k) /= rhs;
             }
         }
     }
@@ -473,7 +473,7 @@ Tensor& Tensor::operator=(const Tensor& other){
 
             for (int k = 0; k < d; ++k){
 
-                data[i][j][k] = other.data[i][j][k];
+                data[i][j][k] = other(i, j, k);
             }
         }
     }
