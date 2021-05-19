@@ -636,7 +636,7 @@ Tensor Tensor::padding(int pad_h, int pad_w)const{
 
             for (int k = 0; k < d; ++k){
 
-                pad[i + pad_h][j + pad_w][d] = data[i][j][k];
+                pad(i + pad_h, j + pad_w, d) = data[i][j][k];
             }
         }
     }
@@ -683,7 +683,7 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
 
             for (int k = depth_start; k < depth_end; ++k){
 
-                sub[i - row_start][j - col_start][k - depth_start] = data[i][j][k];
+                sub(i - row_start, j - col_start, k - depth_start) = data[i][j][k];
             }
         }
     }
@@ -717,39 +717,40 @@ Tensor Tensor::concat(const Tensor& rhs, int axis = 0)const{
         //rows: vertical
         if (c != rhs.c || d != rhs.d) throw (concat_wrong_dimension());
 
-        Tensor union(r + rhs.r, c, d, 0.0f);
+        Tensor conc(r + rhs.r, c, d, 0.0f);
 
-        for (int i = 0; i < union.r; ++i){
-            for (int j = 0; j < union.c; ++j){
-                for (int k = 0; k < union.d; ++k){
+        for (int i = 0; i < conc.r; ++i){
+            for (int j = 0; j < conc.c; ++j){
+                for (int k = 0; k < conc.d; ++k){
 
                     if (i >= r)
-                        union[i][j][k] = data[i][j][k];
+                        conc(i, j, k) = data[i][j][k];
                     else
-                        union[i][j][k] = rhs.data[i - r][j][k];
+                        conc(i, j, k) = rhs.data[i - r][j][k];
                 }
             }
         }
+        return conc;
 
     } else if (axis == 1){
         //columns: orizontal
 
-        Tensor union(r, c + rhs.c, d, 0.0f);
+        Tensor conc(r, c + rhs.c, d, 0.0f);
 
-        for (int i = 0; i < union.r; ++i){
-            for (int j = 0; j < union.c; ++j){
-                for (int k = 0; k < union.d; ++k){
+        for (int i = 0; i < conc.r; ++i){
+            for (int j = 0; j < conc.c; ++j){
+                for (int k = 0; k < conc.d; ++k){
 
                     if (j >= c)
-                        union[i][j][k] = data[i][j][k];
+                        conc(i, j, k) = data[i][j][k];
                     else
-                        union[i][j][k] = rhs.data[i][j - c][k];
+                        conc(i, j, k) = rhs.data[i][j - c][k];
                 }
             }
         }
-    }
 
-    return union;
+        return conc;
+    }
 }
 
 
@@ -784,11 +785,11 @@ Tensor Tensor::convolve(const Tensor& f)const{
                 for (int l = 0; l < f.r; ++l){
                     for (int m = 0; m < f.c; ++m){
 
-                        val += (copy[i + l][j + m][k] * f[l][m][k]);
+                        val += (conv(i + l, j + m, k) * f(l, m, k));
                     }
                 }
 
-                conv[i][j][k] = val;
+                conv(i, j, k) = val;
             }
         }
     }
