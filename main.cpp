@@ -56,13 +56,13 @@ int main(int argc, char* argv[]){
 
     if (strcmp(operation, "brighten") == 0){
         img = b.brighten(k_size); /* aumenta la luminosità */
-    }     else if (strcmp(operation, "blend") == 0){
+    } else if (strcmp(operation, "blend") == 0){
         cout << alpha << endl;
         c.load_image(fn_in_2);
         img = b.blend(c, alpha); /* effettua il blending di due immagini */
     } else if (strcmp(operation, "gray") == 0){
         img = b.grayscale();
-    }     else if (strcmp(operation, "equalize") == 0){
+    } else if (strcmp(operation, "equalize") == 0){
         img = b.equalize();
     } else if (strcmp(operation, "chromakey") == 0){
         c.load_image(fn_in_2);
