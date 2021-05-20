@@ -13,6 +13,13 @@
 
 using namespace std;
 
+/**
+     * Class constructor
+     *
+     * Parameter-less class constructor
+     */
+Tensor::Tensor() { 
+}
 
 /**
  * Class constructor
@@ -517,7 +524,7 @@ void Tensor::init_random(float mean, float std){
      * @param d The depth
      * @param v The initialization value
      */
-void Tensor::init(int r, int c, int d, float v = 0.0){
+void Tensor::init(int r, int c, int d, float v){
     if (data != nullptr) throw (unknown_operation());
 
 
@@ -584,7 +591,7 @@ void Tensor::clamp(float low, float high){
  *
  * @param new_max New maximum vale
  */
-void Tensor::rescale(float new_max = 1.0){
+void Tensor::rescale(float new_max){
 
     if (data == nullptr) throw (tensor_not_initialized());
 
@@ -624,6 +631,7 @@ void Tensor::rescale(float new_max = 1.0){
  * @return the padded tensor
  */
 Tensor Tensor::padding(int pad_h, int pad_w)const{
+
     if (data == nullptr) throw (tensor_not_initialized());
 
     if (pad_w < 0 || pad_h < 0) throw (unknown_operation());
@@ -708,16 +716,18 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
  * @param axis The axis along which perform the concatenation
  * @return a new Tensor containing the result of the concatenation
  */
-Tensor Tensor::concat(const Tensor& rhs, int axis = 0)const{
+Tensor Tensor::concat(const Tensor& rhs, int axis)const{
+    
     if (data == nullptr) throw (tensor_not_initialized());
     if (rhs.data == nullptr) throw (tensor_not_initialized());
 
+    Tensor conc;
 
     if (axis == 0){
         //rows: vertical
         if (c != rhs.c || d != rhs.d) throw (concat_wrong_dimension());
 
-        Tensor conc(r + rhs.r, c, d, 0.0f);
+        conc.init(r + rhs.r, c, d, 0.0f);
 
         for (int i = 0; i < conc.r; ++i){
             for (int j = 0; j < conc.c; ++j){
@@ -730,12 +740,11 @@ Tensor Tensor::concat(const Tensor& rhs, int axis = 0)const{
                 }
             }
         }
-        return conc;
 
     } else if (axis == 1){
         //columns: orizontal
 
-        Tensor conc(r, c + rhs.c, d, 0.0f);
+        conc.init(r, c + rhs.c, d, 0.0f);
 
         for (int i = 0; i < conc.r; ++i){
             for (int j = 0; j < conc.c; ++j){
@@ -749,8 +758,23 @@ Tensor Tensor::concat(const Tensor& rhs, int axis = 0)const{
             }
         }
 
-        return conc;
+    } else if (axis == 2) {
+        conc.init(r, c, d + rhs.d, 0.0f);
+
+        for (int i = 0; i < conc.r; ++i){
+            for (int j = 0; j < conc.c; ++j){
+                for (int k = 0; k < conc.d; ++k){
+
+                    if (k >= d)
+                        conc(i, j, k) = data[i][j][k];
+                    else
+                        conc(i, j, k) = rhs.data[i][j][k - d];
+                }
+            }
+        }
     }
+
+    return conc;
 }
 
 
@@ -768,7 +792,17 @@ Tensor Tensor::concat(const Tensor& rhs, int axis = 0)const{
  */
 Tensor Tensor::convolve(const Tensor& f)const{
 
-    //quando supera sopra o sotto prendiamo 0
+    if(f.data == nullptr) throw(tensor_not_initialized());
+
+    if(data == nullptr) throw(tensor_not_initialized());
+
+    if (f.r != f.c) throw(dimension_mismatch());
+
+    if(f.r % 2 == 0) throw(filter_odd_dimensions());
+    if(f.c % 2 == 0) throw(filter_odd_dimensions());
+
+    if(d != f.d) thorw(dimension_mismatch());
+
 
     int pad = (f.r - 1) / 2;
 
@@ -835,6 +869,8 @@ int Tensor::depth()const{
 float Tensor::getMin(int k)const{
     if (data == nullptr) throw (tensor_not_initialized());
 
+    if(k >= d) throw(index_out_of_bound());
+
     float min = data[0][0][k];
 
     for (int i = 0; i < r; ++i){
@@ -857,6 +893,8 @@ float Tensor::getMin(int k)const{
  */
 float Tensor::getMax(int k)const{
     if (data == nullptr) throw (tensor_not_initialized());
+
+    if(k >= d) throw(index_out_of_bound());
 
     float max = data[0][0][k];
 
@@ -900,19 +938,20 @@ void Tensor::showSize()const{
  * k: [0 0 0 , 0 0 0, 0 0 0]
 */
 ostream& operator<< (ostream& stream, const Tensor& obj){
+
     if (obj.data == nullptr) throw (tensor_not_initialized());
 
-    for (int k = 0; k < d; ++k){
+    for (int k = 0; k < obj.d; ++k){
         stream << k << ": [";
 
-        for (int i = 0; i < r; ++i){
-            for (int j = 0; j < c; ++j){
-                stream << data[i][j][k];
+        for (int i = 0; i < obj.r; ++i){
+            for (int j = 0; j < obj.c; ++j){
+                stream << obj(i, j, k);
 
-                if (j != c - 1) stream << " ";
+                if (j != obj.c - 1) stream << " ";
             }
 
-            if (i != r - 1) stream << ",";
+            if (i != obj.r - 1) stream << ",";
         }
 
         stream << "]" << endl;
@@ -947,23 +986,25 @@ ostream& operator<< (ostream& stream, const Tensor& obj){
  * @param filename the filename where the tensor is stored
  */
 void Tensor::read_file(string filename){
+
     ifstream input{ filename };
 
     input >> r >> c >> d;
 
-    float*** tmp = data;
-    data = nullptr;
+    if(data != nullptr) {
+        float*** tmp = data;
+        data = nullptr;
 
-    if (tmp != nullptr){
-        for (int i = 0; i < r; ++i){
-            for (int j = 0; j < c; ++j){
-                delete[] tmp[i][j];
+        if (tmp != nullptr){
+            for (int i = 0; i < r; ++i){
+                for (int j = 0; j < c; ++j){
+                    delete[] tmp[i][j];
+                }
+                delete[] tmp[i];
             }
-            delete[] tmp[i];
+            delete[] tmp;
         }
-        delete[] tmp;
     }
-
     init(r, c, d, 0.0F);
 
     for (int i = 0; i < r; ++i){
