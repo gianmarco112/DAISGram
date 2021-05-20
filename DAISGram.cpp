@@ -366,8 +366,6 @@ DAISGram DAISGram::smooth(int h){
 
     Tensor filter(h,h, getDepth(), c);
     
-    cout << filter;
-
     DAISGram final; 
     
     final.data = data.convolve(filter);
