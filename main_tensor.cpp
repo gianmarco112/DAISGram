@@ -1,4 +1,6 @@
+
 #include <stdio.h>
+#include <iostream>
 #include <string.h>
 #include <math.h>
 #include "tensor.h"
@@ -39,8 +41,12 @@ int main(int argc, char* argv[]){
         axis = atoi(argv[5]);
     }
 
-    a.read_file(fn_in_1);
+    a.read_file(fn_in_1);        
     b.read_file(fn_in_2);
+
+    std::cout << a << std::endl;
+
+    std::cout << b << std::endl;
 
     if (strcmp(operation, "+") == 0){
         out = a + b;
@@ -57,6 +63,7 @@ int main(int argc, char* argv[]){
     } else{
         throw(unknown_operation());
     }
+
 
     out.write_file(fn_out);
 

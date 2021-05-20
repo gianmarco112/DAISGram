@@ -19,6 +19,10 @@ using namespace std;
      * Parameter-less class constructor
      */
 Tensor::Tensor() { 
+    data = nullptr;
+    r = 0;
+    c = 0;
+    d = 0;
 }
 
 /**
@@ -215,11 +219,12 @@ bool Tensor::operator==(const Tensor& rhs) const{
  */
 Tensor Tensor::operator-(const Tensor& rhs)const{
 
-    if (data == nullptr) throw (tensor_not_initialized());
+    if (data == nullptr)     throw (tensor_not_initialized());
 
     if (rhs.data == nullptr) throw (tensor_not_initialized());
-
+    
     if (r != rhs.r || c != rhs.c || d != rhs.d) throw (dimension_mismatch());
+
 
     Tensor copy(*this);
 
@@ -442,6 +447,8 @@ Tensor Tensor::operator/(const float& rhs)const{
 
     if (data == nullptr) throw (tensor_not_initialized());
 
+    if (rhs == 0) throw (unknown_operation());
+
     Tensor copy(*this);
 
     for (int i = 0; i < r; ++i){
@@ -467,12 +474,9 @@ Tensor Tensor::operator/(const float& rhs)const{
  */
 Tensor& Tensor::operator=(const Tensor& other){
 
-    if (data == nullptr) throw (tensor_not_initialized());
-
     if (other.data == nullptr) throw (tensor_not_initialized());
 
-    if (r != other.r || c != other.c || d != other.d) throw dimension_mismatch();
-
+    init(other.r, other.c, other.d, 0.0f);
 
     for (int i = 0; i < r; ++i){
 
@@ -525,8 +529,8 @@ void Tensor::init_random(float mean, float std){
      * @param v The initialization value
      */
 void Tensor::init(int r, int c, int d, float v){
-    if (data != nullptr) throw (unknown_operation());
 
+    if (data != nullptr) throw (unknown_operation());
 
     this->r = r;
     this->c = c;
@@ -558,6 +562,7 @@ void Tensor::init(int r, int c, int d, float v){
  * @param high Higher value
  */
 void Tensor::clamp(float low, float high){
+
     if (data == nullptr) throw (tensor_not_initialized());
 
     for (int i = 0; i < r; ++i){
@@ -669,13 +674,14 @@ Tensor Tensor::padding(int pad_h, int pad_w)const{
  * @param depth_end
  * @return the subset of the original tensor
  */
-Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end, unsigned int depth_start, unsigned int depth_end) const{
+Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end, 
+                        unsigned int depth_start, unsigned int depth_end) const{
 
     if (data == nullptr) throw (tensor_not_initialized());
 
-    if (row_start >= r || row_end >= r) throw (index_out_of_bound());
-    if (col_start >= c || col_end >= c) throw (index_out_of_bound());
-    if (depth_start >= d || depth_end >= d) throw (index_out_of_bound());
+    if (row_start >= r || row_end >= r || row_start < 0 || row_end < 0) throw (index_out_of_bound());
+    if (col_start >= c || col_end >= c || col_start < 0 || col_start < 0) throw (index_out_of_bound());
+    if (depth_start >= d || depth_end >= d || depth_start < 0 || depth_end < 0) throw (index_out_of_bound());
 
     if (row_start > row_end) throw (unknown_operation());
     if (col_start > col_end) throw (unknown_operation());
@@ -695,6 +701,8 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
             }
         }
     }
+
+    return sub;
 }
 
 /**
@@ -939,9 +947,9 @@ void Tensor::showSize()const{
 */
 ostream& operator<< (ostream& stream, const Tensor& obj){
 
-    if (obj.data == nullptr) throw (tensor_not_initialized());
+    //if (obj.data == nullptr) throw (tensor_not_initialized());
 
-    for (int k = 0; k < obj.d; ++k){
+    for (int k = 0; k < obj.d; ++k) {
         stream << k << ": [";
 
         for (int i = 0; i < obj.r; ++i){
@@ -956,6 +964,7 @@ ostream& operator<< (ostream& stream, const Tensor& obj){
 
         stream << "]" << endl;
     }
+    return stream;
 }
 
 /**
@@ -1005,7 +1014,8 @@ void Tensor::read_file(string filename){
             delete[] tmp;
         }
     }
-    init(r, c, d, 0.0F);
+
+    init(r, c, d, 0.0f);
 
     for (int i = 0; i < r; ++i){
         for (int j = 0; j < c; ++j){
@@ -1045,17 +1055,14 @@ void Tensor::read_file(string filename){
 void Tensor::write_file(string filename){
     ofstream output{ filename };
 
-    output << r << c << d;
+    output << r << "\n" << c << "\n" << d << "\n";
 
     for (int i = 0; i < r; ++i){
         for (int j = 0; j < c; ++j){
             for (int k = 0; k < d; ++k){
-                output << data[i][j][k];
+                output << data[i][j][k] << "\n";
             }
         }
     }
 }
 
-
-
-// TODO: ERROR FILE AND UNKOWN OPERATION ON FILE (INIT)
