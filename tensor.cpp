@@ -955,8 +955,8 @@ void Tensor::showSize()const{
  * k: [0 0 0 , 0 0 0, 0 0 0]
 */
 ostream& operator<< (ostream& stream, const Tensor& obj){
-
-    //if (obj.data == nullptr) throw (tensor_not_initialized());
+    
+    if (obj.data == nullptr) throw (tensor_not_initialized());
 
     for (int k = 0; k < obj.d; ++k) {
         stream << k << ": [";
