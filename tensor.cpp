@@ -25,7 +25,7 @@ using namespace std;
  * @param v
  * @return new Tensor
  */
-Tensor::Tensor(int r, int c, int d, float v = 0.0){
+Tensor::Tensor(int r, int c, int d, float v){
     this->r = r;
     this->c = c;
     this->d = d;
