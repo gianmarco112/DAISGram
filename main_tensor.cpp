@@ -44,10 +44,6 @@ int main(int argc, char* argv[]){
     a.read_file(fn_in_1);        
     b.read_file(fn_in_2);
 
-    std::cout << a << std::endl;
-
-    std::cout << b << std::endl;
-
     if (strcmp(operation, "+") == 0){
         out = a + b;
     } else if (strcmp(operation, "-") == 0){

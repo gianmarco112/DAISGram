@@ -733,15 +733,15 @@ Tensor Tensor::concat(const Tensor& rhs, int axis)const{
 
     if (axis == 0){
         //rows: vertical
-        if (c != rhs.c || d != rhs.d) throw (concat_wrong_dimension());
+        if (c != rhs.c || d != rhs.d) throw (dimension_mismatch());
 
         conc.init(r + rhs.r, c, d, 0.0f);
 
         for (int i = 0; i < conc.r; ++i){
             for (int j = 0; j < conc.c; ++j){
                 for (int k = 0; k < conc.d; ++k){
-
-                    if (i >= r)
+                    
+                    if (i < r)
                         conc(i, j, k) = data[i][j][k];
                     else
                         conc(i, j, k) = rhs.data[i - r][j][k];
@@ -752,13 +752,15 @@ Tensor Tensor::concat(const Tensor& rhs, int axis)const{
     } else if (axis == 1){
         //columns: orizontal
 
+        if (r != rhs.r || d != rhs.d) throw (dimension_mismatch());
+
         conc.init(r, c + rhs.c, d, 0.0f);
 
         for (int i = 0; i < conc.r; ++i){
             for (int j = 0; j < conc.c; ++j){
                 for (int k = 0; k < conc.d; ++k){
 
-                    if (j >= c)
+                    if (j < c)
                         conc(i, j, k) = data[i][j][k];
                     else
                         conc(i, j, k) = rhs.data[i][j - c][k];
@@ -766,20 +768,25 @@ Tensor Tensor::concat(const Tensor& rhs, int axis)const{
             }
         }
 
-    } else if (axis == 2) {
+    } else if (axis == 2) {                
+        
+        if (c != rhs.c || r != rhs.r) throw (dimension_mismatch());
+
         conc.init(r, c, d + rhs.d, 0.0f);
 
         for (int i = 0; i < conc.r; ++i){
             for (int j = 0; j < conc.c; ++j){
                 for (int k = 0; k < conc.d; ++k){
 
-                    if (k >= d)
+                    if (k < d)
                         conc(i, j, k) = data[i][j][k];
                     else
                         conc(i, j, k) = rhs.data[i][j][k - d];
                 }
             }
         }
+    } else {
+        throw(concat_wrong_dimension());
     }
 
     return conc;
@@ -815,6 +822,8 @@ Tensor Tensor::convolve(const Tensor& f)const{
     int pad = (f.r - 1) / 2;
 
     Tensor copy = padding(pad, pad);
+
+    cout << copy << endl;
 
     Tensor conv(*this);
 
@@ -875,6 +884,7 @@ int Tensor::depth()const{
  * @return the minimum of data( , , k)
  */
 float Tensor::getMin(int k)const{
+
     if (data == nullptr) throw (tensor_not_initialized());
 
     if(k >= d) throw(index_out_of_bound());
@@ -995,6 +1005,9 @@ ostream& operator<< (ostream& stream, const Tensor& obj){
  * @param filename the filename where the tensor is stored
  */
 void Tensor::read_file(string filename){
+
+
+    //TODO error file, with .eof every time
 
     ifstream input{ filename };
 
