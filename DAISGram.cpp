@@ -364,15 +364,13 @@ DAISGram DAISGram::smooth(int h){
 
     float c = (float) 1.0f / (h * h);
 
-    Tensor filter(h,h, getDepth(), 0.0f);
+    Tensor filter(h,h, getDepth(), c);
     
     cout << filter;
 
     DAISGram final; 
     
     final.data = data.convolve(filter);
-    
-    cout << data << final;
 
     return final;
 }
