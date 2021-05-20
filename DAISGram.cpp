@@ -106,7 +106,7 @@ DAISGram DAISGram::brighten(float bright){
  * @return returns a new DAISGram containing the modified object
  */
 DAISGram DAISGram::grayscale(){
-
+    //Media del valore dei tre canali per ogni punto e ogni canale avrà gli stessi valori, alla fine avremo tutti i canali uguali
 }
 
 /**
