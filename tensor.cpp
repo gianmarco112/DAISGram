@@ -801,7 +801,7 @@ Tensor Tensor::convolve(const Tensor& f)const{
     if(f.r % 2 == 0) throw(filter_odd_dimensions());
     if(f.c % 2 == 0) throw(filter_odd_dimensions());
 
-    if(d != f.d) thorw(dimension_mismatch());
+    if(d != f.d) throw(dimension_mismatch());
 
 
     int pad = (f.r - 1) / 2;
