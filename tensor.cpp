@@ -680,7 +680,7 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
     if (data == nullptr) throw (tensor_not_initialized());
 
     if (row_start >= r || row_end >= r || row_start < 0 || row_end < 0) throw (index_out_of_bound());
-    if (col_start >= c || col_end >= c || col_start < 0 || col_start < 0) throw (index_out_of_bound());
+    if (col_start >= c || col_end >= c || col_start < 0 || col_end < 0) throw (index_out_of_bound());
     if (depth_start >= d || depth_end >= d || depth_start < 0 || depth_end < 0) throw (index_out_of_bound());
 
     if (row_start > row_end) throw (unknown_operation());
