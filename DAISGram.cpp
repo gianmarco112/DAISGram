@@ -382,7 +382,9 @@ DAISGram DAISGram::smooth(int h){
  * @return returns a new DAISGram containing the modified object
  */
 DAISGram DAISGram::edge(){
+
     DAISGram copy;
+
     copy.data.init(getRows(), getCols(), getDepth(), 0.0f);
     for (int i = 0; i < getRows(); ++i) {
         for (int j = 0; j < getCols(); ++j){
@@ -420,8 +422,19 @@ DAISGram DAISGram::edge(){
  * @param alpha The parameter of the convex combination
  * @return returns a new DAISGram containing the blending of the two images.
  */
-DAISGram DAISGram::blend(const DAISGram& rhs, float alpha = 0.5){
+DAISGram DAISGram::blend(const DAISGram& rhs, float alpha){
 
+    DAISGram copy;
+
+    copy.data.init(getRows(), getCols(), getDepth(), 0.0f);
+
+    for (int i = 0; i < getRows(); ++i) {
+        for (int j = 0; j < getCols(); ++j){
+            for (int k = 0; k < getDepth(); ++k) {
+               copy.data(i,j,k) = data(i,j,k) * alpha + (1 - alpha) * rhs.data(i, j, k);
+            }
+        }
+    }
 }
 
 /**
