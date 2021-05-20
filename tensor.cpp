@@ -649,10 +649,11 @@ Tensor Tensor::padding(int pad_h, int pad_w)const{
 
             for (int k = 0; k < d; ++k){
 
-                pad(i + pad_h, j + pad_w, d) = data[i][j][k];
+                pad(i + pad_h, j + pad_w, k) = data[i][j][k];
             }
         }
     }
+
     return pad;
 }
 
@@ -823,8 +824,6 @@ Tensor Tensor::convolve(const Tensor& f)const{
 
     Tensor copy = padding(pad, pad);
 
-    cout << copy << endl;
-
     Tensor conv(*this);
 
     for (int i = 0; i < r; ++i){
@@ -836,7 +835,7 @@ Tensor Tensor::convolve(const Tensor& f)const{
                 for (int l = 0; l < f.r; ++l){
                     for (int m = 0; m < f.c; ++m){
 
-                        val += (conv(i + l, j + m, k) * f(l, m, k));
+                        val += (copy(i + l, j + m, k) * f(l, m, k));
                     }
                 }
 
