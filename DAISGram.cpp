@@ -459,6 +459,8 @@ DAISGram DAISGram::blend(const DAISGram& rhs, float alpha){
  * @return returns a new DAISGram containing the result.
  */
 DAISGram DAISGram::greenscreen(DAISGram& bkg, int rgb[], float threshold[]){
+
+
    return *this;
 }
 /**
