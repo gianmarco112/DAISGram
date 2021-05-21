@@ -8,11 +8,9 @@
 
 using namespace std;
 
-DAISGram::DAISGram() {
-}
+DAISGram::DAISGram(){}
 
-DAISGram::~DAISGram(){
-}
+DAISGram::~DAISGram(){}
 
 
 
@@ -109,10 +107,10 @@ DAISGram DAISGram::brighten(float bright){
 
     copy.data.init(getRows(), getCols(), getDepth(), 0.0f);
 
-    for (int i = 0; i < getRows(); ++i) {
+    for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
-            for (int k = 0; k < getDepth(); ++k) {
-               copy.data(i,j,k) = data(i,j,k) + bright;
+            for (int k = 0; k < getDepth(); ++k){
+                copy.data(i, j, k) = data(i, j, k) + bright;
             }
         }
     }
@@ -132,26 +130,26 @@ DAISGram DAISGram::brighten(float bright){
 DAISGram DAISGram::grayscale(){
     //Media del valore dei tre canali per ogni punto e ogni canale avrà gli stessi valori, alla fine avremo tutti i canali uguali
     DAISGram gray;
-    
+
     gray.data.init(getRows(), getCols(), getDepth(), 0.0f);
 
-    for (int i = 0; i < getRows(); ++i) {
+    for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
-            
+
             float m = 0;
-            
-            for (int k = 0; k < getDepth(); ++k) {
-               m += data(i,j,k) ;
+
+            for (int k = 0; k < getDepth(); ++k){
+                m += data(i, j, k);
             }
-            
+
             m /= (float) getDepth();
 
-            for(int k=0; k < getDepth();++k) {
-               gray.data(i, j, k) = m;
+            for (int k = 0; k < getDepth();++k){
+                gray.data(i, j, k) = m;
             }
         }
     }
-    	
+
     return gray;
 }
 
@@ -171,7 +169,7 @@ DAISGram DAISGram::grayscale(){
 DAISGram DAISGram::warhol(){
     //top right devo salvare i valori del canale Rosso, Copiare il canale verde su quello rosso e copiare la copia sul verde
     //Dimensione doppia dell'immagine originale
-    
+
     /*
     ●	In alto a sinistra viene replicata l’immagine originale
     ●	In alto a destra, a partire dall’immagine originale, viene invertito il canale Rosso con il canale Verde
@@ -182,10 +180,10 @@ DAISGram DAISGram::warhol(){
     DAISGram top_left;
 
     top_left.data.init(getRows(), getCols(), getDepth(), 0.0f);
-    for (int i = 0; i < getRows(); ++i) {
+    for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
-            for (int k = 0; k < getDepth(); ++k) {
-               top_left.data(i,j,k) = data(i,j,k);
+            for (int k = 0; k < getDepth(); ++k){
+                top_left.data(i, j, k) = data(i, j, k);
             }
         }
     }
@@ -194,14 +192,14 @@ DAISGram DAISGram::warhol(){
     DAISGram top_right;
 
     top_right.data.init(getRows(), getCols(), getDepth(), 0.0f);
-    for (int i = 0; i < getRows(); ++i) {
+    for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
-            
-            top_right.data(i,j,0) = data(i,j,1); //G->R
-            
-            top_right.data(i,j,1) = data(i,j,0); //R->G
 
-            top_right.data(i,j,2) = data(i,j,2); //B
+            top_right.data(i, j, 0) = data(i, j, 1); //G->R
+
+            top_right.data(i, j, 1) = data(i, j, 0); //R->G
+
+            top_right.data(i, j, 2) = data(i, j, 2); //B
         }
     }
 
@@ -209,14 +207,14 @@ DAISGram DAISGram::warhol(){
     DAISGram bottom_left;
 
     bottom_left.data.init(getRows(), getCols(), getDepth(), 0.0f);
-    for (int i = 0; i < getRows(); ++i) {
+    for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
-            
-            bottom_left.data(i,j,2) = data(i,j,1); //G->B
-            
-            bottom_left.data(i,j,0) = data(i,j,0); //R
 
-            bottom_left.data(i,j,1) = data(i,j,2); //B->G
+            bottom_left.data(i, j, 2) = data(i, j, 1); //G->B
+
+            bottom_left.data(i, j, 0) = data(i, j, 0); //R
+
+            bottom_left.data(i, j, 1) = data(i, j, 2); //B->G
         }
     }
 
@@ -224,20 +222,20 @@ DAISGram DAISGram::warhol(){
     DAISGram bottom_right;
 
     bottom_right.data.init(getRows(), getCols(), getDepth(), 0.0f);
-    for (int i = 0; i < getRows(); ++i) {
+    for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
-            
-            bottom_right.data(i,j,2) = data(i,j,0); //R->B
-            
-            bottom_right.data(i,j,1) = data(i,j,1); //G
 
-            bottom_right.data(i,j,0) = data(i,j,2); //B->R
+            bottom_right.data(i, j, 2) = data(i, j, 0); //R->B
+
+            bottom_right.data(i, j, 1) = data(i, j, 1); //G
+
+            bottom_right.data(i, j, 0) = data(i, j, 2); //B->R
         }
     }
 
 
     Tensor top = top_left.data.concat(top_right.data, 1);
-    Tensor bottom = bottom_left.data.concat(bottom_right.data,1);
+    Tensor bottom = bottom_left.data.concat(bottom_right.data, 1);
 
     DAISGram complete;
     complete.data = top.concat(bottom, 0);
@@ -265,27 +263,27 @@ DAISGram DAISGram::sharpen(){
 
     copy.data.init(getRows(), getCols(), getDepth(), 0.0f);
 
-    for (int i = 0; i < getRows(); ++i) {
+    for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
-            for (int k = 0; k < getDepth(); ++k) {
-               copy.data(i,j,k) = data(i,j,k);
+            for (int k = 0; k < getDepth(); ++k){
+                copy.data(i, j, k) = data(i, j, k);
             }
         }
     }
 
-    Tensor filter(3,3, getDepth(), 0.0f);
+    Tensor filter(3, 3, getDepth(), 0.0f);
 
-    for(int k = 0; k < getDepth(); ++k) {
+    for (int k = 0; k < getDepth(); ++k){
 
-       filter(0, 0, k) = filter(2, 2, k) = filter(0, 2, k) = filter(2, 0, k) = 0;
+        filter(0, 0, k) = filter(2, 2, k) = filter(0, 2, k) = filter(2, 0, k) = 0;
 
-       filter(0, 1, k) = filter(1, 0, k) = filter(2, 1, k) = filter(1, 2, k) = -1;
- 
-       filter(1, 1, k) = 5;
+        filter(0, 1, k) = filter(1, 0, k) = filter(2, 1, k) = filter(1, 2, k) = -1;
+
+        filter(1, 1, k) = 5;
     }
 
-    DAISGram final; 
-    
+    DAISGram final;
+
     final.data = copy.data.convolve(filter);
 
     final.data.clamp(0, 255);
@@ -309,23 +307,23 @@ DAISGram DAISGram::sharpen(){
  * @return returns a new DAISGram containing the modified object
  */
 DAISGram DAISGram::emboss(){
-    
+
     DAISGram copy;
     copy.data.init(getRows(), getCols(), getDepth(), 0.0f);
-    for (int i = 0; i < getRows(); ++i) {
+    for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
-            for (int k = 0; k < getDepth(); ++k) {
-               copy.data(i,j,k) = data(i,j,k);
+            for (int k = 0; k < getDepth(); ++k){
+                copy.data(i, j, k) = data(i, j, k);
             }
         }
     }
 
-    Tensor filter(3,3, getDepth(), 0.0f);
+    Tensor filter(3, 3, getDepth(), 0.0f);
 
-    for(int k = 0; k < getDepth(); ++k) {
+    for (int k = 0; k < getDepth(); ++k){
 
         filter(0, 0, k) = -2;
-       
+
         filter(0, 1, k) = filter(1, 0, k) = -1;
 
         filter(0, 2, k) = filter(2, 0, k) = 0;
@@ -335,10 +333,10 @@ DAISGram DAISGram::emboss(){
         filter(2, 2, k) = 2;
     }
 
-    DAISGram final; 
-    
+    DAISGram final;
+
     final.data = copy.data.convolve(filter);
-    
+
     final.data.clamp(0, 255);
 
     return final;
@@ -364,10 +362,10 @@ DAISGram DAISGram::smooth(int h){
 
     float c = (float) 1.0f / (h * h);
 
-    Tensor filter(h,h, getDepth(), c);
-    
-    DAISGram final; 
-    
+    Tensor filter(h, h, getDepth(), c);
+
+    DAISGram final;
+
     final.data = data.convolve(filter);
 
     return final;
@@ -395,15 +393,15 @@ DAISGram DAISGram::edge(){
 
     DAISGram gray = this->grayscale();
 
-    Tensor filter(3,3, getDepth(), 0.0f);
-    
-    for(int k = 0; k < getDepth(); ++k) {
+    Tensor filter(3, 3, getDepth(), 0.0f);
 
-       filter(0, 0, k) = filter(2, 2, k) = filter(0, 2, k) = filter(2, 0, k) = filter(0, 1, k) = filter(1, 0, k) = filter(2, 1, k) = filter(1, 2, k) = -1;
-       filter(1, 1, k) = 8;
+    for (int k = 0; k < getDepth(); ++k){
+
+        filter(0, 0, k) = filter(2, 2, k) = filter(0, 2, k) = filter(2, 0, k) = filter(0, 1, k) = filter(1, 0, k) = filter(2, 1, k) = filter(1, 2, k) = -1;
+        filter(1, 1, k) = 8;
     }
-    
-    DAISGram final; 
+
+    DAISGram final;
 
     final.data = gray.data.convolve(filter);
 
@@ -433,10 +431,10 @@ DAISGram DAISGram::blend(const DAISGram& rhs, float alpha){
 
     copy.data.init(getRows(), getCols(), getDepth(), 0.0f);
 
-    for (int i = 0; i < getRows(); ++i) {
+    for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
-            for (int k = 0; k < getDepth(); ++k) {
-               copy.data(i,j,k) = data(i,j,k) * alpha + (1 - alpha) * rhs.data(i, j, k);
+            for (int k = 0; k < getDepth(); ++k){
+                copy.data(i, j, k) = data(i, j, k) * alpha + (1 - alpha) * rhs.data(i, j, k);
             }
         }
     }
@@ -460,8 +458,49 @@ DAISGram DAISGram::blend(const DAISGram& rhs, float alpha){
  */
 DAISGram DAISGram::greenscreen(DAISGram& bkg, int rgb[], float threshold[]){
 
+    //controllo k non maggiore di 3
+    if(data == nullptr) throw(tensor_not_initialized());
 
-   return *this;
+    if(bkg.data == nullptr) throw(tensor_not_initialized());
+
+    if (this->getCols() != bkg.getCols()) throw (dimension_mismatch());
+
+    if (this->getRows() != bkg.getRows()) throw (dimension_mismatch());
+
+    if (this->getDepth() != bkg.getDepth()) throw (dimension_mismatch());
+
+    if(this->getDepth() > 3 || bkg.getDepth() > 3) throw (dimension_mismatch());
+
+
+    DAISGram copy;
+
+    Tensor pixel(this->data);
+
+    copy.data = Tensor(data);
+
+    for (int i = 0; i < getRows(); ++i){
+        for (int j = 0; j < getCols(); ++j){
+
+            if (data(i, j, 0) >= (rgb[0] - threshold[0]) && data(i, j, 0) <= (rgb[0] + threshold[0])){
+
+                if (data(i, j, 1) >= (rgb[1] - threshold[1]) && data(i, j, 1) <= (rgb[1] + threshold[1])){
+
+                    if (data(i, j, 2) >= (rgb[2] - threshold[2]) && data(i, j, 2) <= (rgb[2] + threshold[2])){
+
+                        for (int k = 0; k < 3; ++k){
+                            copy.data(i, j, k) = bkg.data(i, j, k);
+                        }
+
+
+                    }
+                }
+            }
+
+
+        }
+    }
+
+    return copy;
 }
 /**
  * Equalize
@@ -473,7 +512,8 @@ DAISGram DAISGram::greenscreen(DAISGram& bkg, int rgb[], float threshold[]){
  * @return returns a new DAISGram containing the equalized image.
  */
 DAISGram DAISGram::equalize(){
-   return *this;
+    
+    return *this;
 }
 
 /**
