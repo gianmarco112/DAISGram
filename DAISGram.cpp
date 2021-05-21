@@ -459,9 +459,9 @@ DAISGram DAISGram::blend(const DAISGram& rhs, float alpha){
 DAISGram DAISGram::greenscreen(DAISGram& bkg, int rgb[], float threshold[]){
 
     //controllo k non maggiore di 3
-    if (data == nullptr) throw(tensor_not_initialized());
+    //if (data == nullptr) throw(tensor_not_initialized());
 
-    if (bkg.data == nullptr) throw(tensor_not_initialized());
+    //if (bkg.data == nullptr) throw(tensor_not_initialized());
 
     if (this->getCols() != bkg.getCols()) throw (dimension_mismatch());
 
@@ -513,54 +513,51 @@ DAISGram DAISGram::equalize(){
 
     DAISGram copy;
 
-    copy = grayscale();
-    //copy.data = Tensor(data);
+    //copy = grayscale();
+    copy.data = Tensor(data);
 
     for (int k = 0; k < getDepth(); ++k){
 
         int count[256];
 
         for (int i = 0; i < 256; ++i){
-            count[i] = count[i] = 0;
+            count[i] = 0;
         }
 
         for (int i = 0; i < getRows(); ++i){
             for (int j = 0; j < getCols(); ++j){
+
                 ++count[(int) copy.data(i, j, k)];
             }
         }
 
-        int equalize[256];
+        float equalize[256];
 
-        int cdf_min = count[(int) copy.data.getMin(k)];
+        float cdf_min = count[(int) copy.data.getMin(k)];
 
         int cdf = 0;
 
-        int den = (copy.getRows() * copy.getCols()) - cdf_min;
+        float den = (copy.getRows() * copy.getCols()) - cdf_min;
 
         for (int i = (int) copy.data.getMin(k); i < 256; ++i){
 
             cdf += count[i];
 
-            int delta_cdf = cdf - cdf_min;
+            float delta_cdf = cdf - cdf_min;
 
-            equalize[i] = (delta_cdf / den) * 255;
+            equalize[i] = (delta_cdf / den) * 255.0f;
         }
 
         for (int i = 0; i < copy.getRows(); ++i){
             for (int j = 0; j < copy.getCols(); ++j){
 
-                copy.data(i, j, k) = (float) equalize[(int) copy.data(i, j, k)];
+                copy.data(i, j, k) = equalize[(int) copy.data(i, j, k)];
             }
         }
 
     }
 
-
-
-
-
-    return *this;
+    return copy;
 }
 
 /**
