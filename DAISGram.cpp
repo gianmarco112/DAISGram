@@ -514,6 +514,7 @@ DAISGram DAISGram::equalize(){
     DAISGram copy;
 
     //copy = grayscale();
+
     copy.data = Tensor(data);
 
     for (int k = 0; k < getDepth(); ++k){
