@@ -176,6 +176,7 @@ DAISGram DAISGram::warhol(){
     ●	In basso a sinistra, a partire dall’immagine originale, viene invertito il canale Verde con il canale Blu
     ●	In basso a destra, a partire dall’immagine originale, viene invertito il canale Rosso con il canale Blu
     */
+   
     //immagine normale
     DAISGram top_left;
 
@@ -309,7 +310,9 @@ DAISGram DAISGram::sharpen(){
 DAISGram DAISGram::emboss(){
 
     DAISGram copy;
+
     copy.data.init(getRows(), getCols(), getDepth(), 0.0f);
+
     for (int i = 0; i < getRows(); ++i){
         for (int j = 0; j < getCols(); ++j){
             for (int k = 0; k < getDepth(); ++k){
@@ -426,6 +429,8 @@ DAISGram DAISGram::edge(){
  * @return returns a new DAISGram containing the blending of the two images.
  */
 DAISGram DAISGram::blend(const DAISGram& rhs, float alpha){
+
+    if(alpha > 1 || alpha < 0) throw(unknown_operation());
 
     DAISGram copy;
 

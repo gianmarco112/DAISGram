@@ -176,8 +176,8 @@ bool Tensor::operator==(const Tensor& rhs) const{
     if (data == nullptr) throw (tensor_not_initialized());
 
     if (rhs.data == nullptr) throw (tensor_not_initialized());
-
     if (r != rhs.r || c != rhs.c || d != rhs.d) throw (dimension_mismatch());
+
 
     bool check = true;
 
@@ -564,6 +564,8 @@ void Tensor::init(int r, int c, int d, float v){
 void Tensor::clamp(float low, float high){
 
     if (data == nullptr) throw (tensor_not_initialized());
+
+    if(low > high) throw (unknown_operation());
 
     for (int i = 0; i < r; ++i){
 
@@ -1005,10 +1007,9 @@ ostream& operator<< (ostream& stream, const Tensor& obj){
  */
 void Tensor::read_file(string filename){
 
+    ifstream input;
+	input.open(filename);
 
-    //TODO error file, with .eof every time
-
-    ifstream input{ filename };
 
     input >> r >> c >> d;
 
@@ -1065,8 +1066,10 @@ void Tensor::read_file(string filename){
  * @param filename the filename where the tensor should be stored
  */
 void Tensor::write_file(string filename){
-    ofstream output{ filename };
-
+    
+    ofstream output;
+	output.open(filename);
+    
     output << r << "\n" << c << "\n" << d << "\n";
 
     for (int i = 0; i < r; ++i){
