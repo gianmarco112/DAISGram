@@ -545,13 +545,13 @@ DAISGram DAISGram::equalize(){
 
             float delta_cdf = cdf - cdf_min;
 
-            equalize[i] = (delta_cdf / den) * 255.0f;
+            equalize[i] = round( (delta_cdf / den) * 255.0f );
         }
 
         for (int i = 0; i < copy.getRows(); ++i){
             for (int j = 0; j < copy.getCols(); ++j){
 
-                copy.data(i, j, k) = equalize[(int) copy.data(i, j, k)];
+                copy.data(i, j, k) = equalize[ (int) copy.data(i, j, k) ];
             }
         }
 
